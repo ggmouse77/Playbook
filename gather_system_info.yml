@@ -1,0 +1,30 @@
+---
+- name: 시스템 정보 수집
+  hosts: work
+  gather_facts: true
+  become: false
+
+  tasks:
+    - name: 호스트네임 출력
+      ansible.builtin.debug:
+        msg: "호스트네임: {{ ansible_hostname }}"
+
+    - name: IP 주소 출력
+      ansible.builtin.debug:
+        msg: "IP 주소: {{ ansible_default_ipv4.address }}"
+
+    - name: CPU 모델명 출력
+      ansible.builtin.debug:
+        msg: "CPU 모델명: {{ ansible_processor[-1] }}"
+
+    - name: 메모리 총량 출력 (MB)
+      ansible.builtin.debug:
+        msg: "메모리 총량: {{ ansible_memtotal_mb }} MB"
+
+    - name: 디스크 용량 출력 (루트 마운트 기준)
+      ansible.builtin.debug:
+        msg: "디스크 총량: {{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_total') | list | first // 0 | int // 1 // 1024 // 1024 }} MB"
+
+    - name: OS 이름 및 버전 출력
+      ansible.builtin.debug:
+        msg: "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
