@@ -16,19 +16,7 @@
     - name: MAC 주소 출력
       ansible.builtin.debug:
         msg: "MAC 주소: {{ ansible_default_ipv4.macaddress }}"
-    
-    - name: 루트 디바이스 출력 (/ 파티션이 어떤 디스크인지)
-      ansible.builtin.debug:
-        msg: >
-          디스크 종류: {{
-            ansible_mounts
-            | selectattr('mount', 'equalto', '/')
-            | map(attribute='device')
-            | list
-            | first
-            | regex_search('/dev/([a-zA-Z0-9]+)', '\\1')
-          }}
-
+  
     - name: OS 버전 출력
       ansible.builtin.debug:
         msg: "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
