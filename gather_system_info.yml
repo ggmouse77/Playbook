@@ -13,18 +13,23 @@
       ansible.builtin.debug:
         msg: "IP 주소: {{ ansible_default_ipv4.address }}"
 
-    - name: CPU 모델명 출력
+    - name: MAC 주소 출력
       ansible.builtin.debug:
-        msg: "CPU 모델명: {{ ansible_processor[-1] }}"
-
-    - name: 메모리 총량 출력 (MB)
+        msg: "MAC 주소: {{ ansible_default_ipv4.macaddress }}"
+    
+    - name: 루트 디바이스 출력 (/ 파티션이 어떤 디스크인지)
       ansible.builtin.debug:
-        msg: "메모리 총량: {{ ansible_memtotal_mb }} MB"
+        msg: >
+          디스크 종류: {{
+            ansible_mounts
+            | selectattr('mount', 'equalto', '/')
+            | map(attribute='device')
+            | list
+            | first
+            | regex_search('/dev/([a-zA-Z0-9]+)', '\\1')
+          }}
 
-    - name: 디스크 용량 출력 (루트 마운트 기준)
-      ansible.builtin.debug:
-        msg: "디스크 총량: {{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_total') | list | first // 0 | int // 1 // 1024 // 1024 }} MB"
-
-    - name: OS 이름 및 버전 출력
+    - name: OS 버전 출력
       ansible.builtin.debug:
         msg: "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
