@@ -16,8 +16,16 @@
     - name: MAC 주소 출력
       ansible.builtin.debug:
         msg: "MAC 주소: {{ ansible_default_ipv4.macaddress }}"
-  
+
     - name: OS 버전 출력
       ansible.builtin.debug:
         msg: "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
 
+    - name: 업타임 출력 (시:분 형식)
+      ansible.builtin.shell: "awk '{print int($1/3600)\":\"int(($1%3600)/60)}' /proc/uptime"
+      register: uptime_result
+
+    - name: 업타임 결과 출력
+      ansible.builtin.debug:
+        msg: "업타임 (시:분): {{ uptime_result.stdout }}"
+        
