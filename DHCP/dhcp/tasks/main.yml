@@ -1,0 +1,19 @@
+---
+# tasks file for dhcp
+
+- block:
+		- name: Check if the infra variable is defined.
+				debug:
+						msg: Exiting because infra variable is undefined.
+
+		- ansible.builtin.meta: end_play
+		when: infra is undefined
+
+		- name: Include Variables
+				include_tasks:"{{ infra }}.yml"
+
+		- include_tasks: add.yml
+				when:			act == "add"		
+
+		- include_tasks: del.yml
+				when:			act == "del"	
