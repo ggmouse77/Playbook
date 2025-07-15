@@ -1,0 +1,9 @@
+---
+- name: Add a host to the DHCP Server
+		hosts: dhcpcae02
+		vars:
+				act: add
+				#inven: yes
+
+		roles:
+				- dhcp
