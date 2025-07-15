@@ -1,0 +1,9 @@
+---
+- name: Deleting a Host on a DHCP Server
+		hosts: dhcpcae02
+		vars:
+				act: del
+				#inven: yes
+
+roles:
+		- dhcp
