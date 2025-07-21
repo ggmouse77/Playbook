@@ -43,10 +43,12 @@
       when: not bootcfg_check.stat.exists
       delegate_to: "{{ tftp_host }}"
 
-    - name: Extract ISO contents
-      ansible.builtin.command: "tar cf - -C {{ mount_point }} . | tar xf - -C {{ tftp_target_dir }}"
+    - name: Copy ISO contents using synchronize
+      ansible.posix.synchronize:
+        src: "{{ mount_point }}/"
+        dest: "{{ tftp_target_dir }}/"
+        recursive: true
       become: true
-      when: not bootcfg_check.stat.exists
       delegate_to: "{{ tftp_host }}"
 
     - name: Unmount ISO
@@ -79,9 +81,4 @@
       when: not bootcfg_check.stat.exists
       delegate_to: "{{ tftp_host }}"
 
-    - name: Unmount ISO
-      ansible.builtin.command: "umount {{ mount_point }}"
-      become: true
-      when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
       
