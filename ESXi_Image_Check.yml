@@ -64,6 +64,15 @@
       when: not bootcfg_check.stat.exists
       delegate_to: "{{ tftp_host }}"
 
+    - name: Fix kernel= path in boot.cfg
+      ansible.builtin.replace:
+        path: "{{ bootcfg_path }}"
+        regexp: '^kernel=/'
+        replace: 'kernel='
+      become: true
+      when: not bootcfg_check.stat.exists
+      delegate_to: "{{ tftp_host }}"
+
     - name: Set kernelopt in boot.cfg
       ansible.builtin.replace:
         path: "{{ bootcfg_path }}"
@@ -78,5 +87,3 @@
       become: true
       when: not bootcfg_check.stat.exists
       delegate_to: "{{ tftp_host }}"
-
-      
