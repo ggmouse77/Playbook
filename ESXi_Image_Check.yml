@@ -38,7 +38,7 @@
       ansible.builtin.file:
         path: "{{ tftp_target_dir }}"
         state: directory
-        mode: '0755'
+        mode: '0777'
       become: true
       when: not bootcfg_check.stat.exists
       delegate_to: "{{ tftp_host }}"
