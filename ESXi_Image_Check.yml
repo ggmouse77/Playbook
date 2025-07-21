@@ -44,7 +44,7 @@
       delegate_to: "{{ tftp_host }}"
 
     - name: Extract ISO contents
-      ansible.builtin.command: "tar cf - -C {{ mount_point }} . | tar xf - -C {{ tftp_target_dir }}"
+      ansible.builtin.shell: "tar cf - -C {{ mount_point }} . | tar xf - -C {{ tftp_target_dir }}"
       become: true
       when: not bootcfg_check.stat.exists
       delegate_to: "{{ tftp_host }}"
