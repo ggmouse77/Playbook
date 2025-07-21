@@ -78,3 +78,10 @@
       become: true
       when: not bootcfg_check.stat.exists
       delegate_to: "{{ tftp_host }}"
+
+    - name: Unmount ISO
+      ansible.builtin.command: "umount {{ mount_point }}"
+      become: true
+      when: not bootcfg_check.stat.exists
+      delegate_to: "{{ tftp_host }}"
+      
