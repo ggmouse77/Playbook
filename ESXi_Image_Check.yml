@@ -1,89 +1,89 @@
 ---
-- name: Deploy ESXi ISO to dynamic TFTP host
-  hosts: localhost
-  gather_facts: no
+- name: Deploy ESXi ISO
+  hosts: awx-exec-01
+  gather_facts: yes
   vars:
-    infra_hosts:
-      SEC: HomeLab01
-      S.LSI: repol001
-      MDP: repomdp001
-    tftp_host: "{{ infra_hosts[Infra] }}"
-
     iso_path: "/user/svrauto/SA/Image/VMware-VMvisor-Installer-8.0U3e-24674464.x86_64.iso"
-    mount_point: "/mnt"
     image_name: "{{ Vendor }}_{{ Model }}_ESXi{{ Ver }}"
-    tftp_target_dir: "/var/lib/tftpboot/{{ image_name }}"
-    bootcfg_path: "{{ tftp_target_dir }}/boot.cfg"
-    kickstart_url: "ks=nfs://ncfilervwp1.seccae.com/svrauto/svrauto/SA/kickstart/esxi/ESXi{{ Ver }}_{{ Infra }}.cfg"
+    extract_dir: "/user/svrauto/SA/ESXi/{{ image_name }}"
+    mount_point: "/mnt/esxi_{{ image_name }}_{{ ansible_date_time.epoch }}"
+    bootcfg_path: "{{ extract_dir }}/boot.cfg"
+    kickstart_url: "ks=nfs://ncfilervwp1.seccae.com/svrauto/svrauto/SA/kickstart/ESXi{{ Ver }}.cfg"
 
   tasks:
-    - name: Check if TFTP image already exists
+    - name: Check if image already exists
       ansible.builtin.stat:
         path: "{{ bootcfg_path }}"
       register: bootcfg_check
-      delegate_to: "{{ tftp_host }}"
 
     - name: Skip if image already exists
-      ansible.builtin.debug:
-        msg: "Image {{ image_name }} already exists on {{ tftp_host }}. Skipping."
+      debug:
+        msg: "Image {{ image_name }} already exists at {{ extract_dir }}"
       when: bootcfg_check.stat.exists
 
-    - name: Mount ISO
-      ansible.builtin.command: "mount -o loop {{ iso_path }} {{ mount_point }}"
-      become: true
-      when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
-
-    - name: Create target directory
-      ansible.builtin.file:
-        path: "{{ tftp_target_dir }}"
+    - name: Create mount directory
+      file:
+        path: "{{ mount_point }}"
         state: directory
         mode: '0755'
       become: true
       when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
+
+    - name: Mount ISO
+      command: "mount -o loop {{ iso_path }} {{ mount_point }}"
+      become: true
+      when: not bootcfg_check.stat.exists
+
+    - name: Create extract directory
+      file:
+        path: "{{ extract_dir }}"
+        state: directory
+        mode: '0775'
+      become: true
+      when: not bootcfg_check.stat.exists
 
     - name: Extract ISO contents
-      ansible.builtin.shell: "tar cf - -C {{ mount_point }} . | tar xf - -C {{ tftp_target_dir }}"
+      shell: "cp -a {{ mount_point }}/. {{ extract_dir }}/"
       become: true
       when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
 
     - name: Unmount ISO
-      ansible.builtin.command: "umount {{ mount_point }}"
+      command: "umount {{ mount_point }}"
       become: true
       when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
+
+    - name: Remove temporary mount directory
+      file:
+        path: "{{ mount_point }}"
+        state: absent
+      become: true
+      when: not bootcfg_check.stat.exists
 
     - name: Set prefix in boot.cfg
-      ansible.builtin.replace:
+      replace:
         path: "{{ bootcfg_path }}"
         regexp: '^prefix=.*'
         replace: "prefix={{ image_name }}"
       become: true
       when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
 
-    - name: Fix kernel= path in boot.cfg
-      ansible.builtin.replace:
+    - name: Fix kernel= path
+      replace:
         path: "{{ bootcfg_path }}"
         regexp: '^kernel=/'
         replace: 'kernel='
       become: true
       when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
 
     - name: Set kernelopt in boot.cfg
-      ansible.builtin.replace:
+      replace:
         path: "{{ bootcfg_path }}"
         regexp: '^kernelopt=.*'
         replace: "kernelopt=runweasel {{ kickstart_url }}"
       become: true
       when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
 
-    - name: Remove slash from modules= line
-      ansible.builtin.shell: "sed -i '/^modules=/ s|/||g' {{ bootcfg_path }}"
+    - name: Clean slashes in modules= line
+      shell: "sed -i '/^modules=/ s|/||g' {{ bootcfg_path }}"
       become: true
       when: not bootcfg_check.stat.exists
-      delegate_to: "{{ tftp_host }}"
