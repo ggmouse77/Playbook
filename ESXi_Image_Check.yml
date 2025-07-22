@@ -3,7 +3,7 @@
   hosts: awx-exec-01
   gather_facts: yes
   vars:
-    iso_path: "/user/svrauto/SA/Image/VMware-VMvisor-Installer-8.0U3e-24674464.x86_64.iso"
+    iso_path: "/user/svrauto/SA/Image/{{ ISO_Image }}"
     image_name: "{{ Vendor }}_{{ Model }}_ESXi{{ Ver }}"
     extract_dir: "/user/svrauto/SA/ESXi/{{ image_name }}"
     mount_point: "/tmp/esxi_{{ image_name }}"
