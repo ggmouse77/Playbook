@@ -63,7 +63,7 @@
       replace:
         path: "{{ bootcfg_path }}"
         regexp: '^prefix=.*'
-        replace: "prefix={{ image_name }}"
+        replace: "prefix=ESXi{{ image_name }}"
       become: true
       when: not bootcfg_check.stat.exists
 
