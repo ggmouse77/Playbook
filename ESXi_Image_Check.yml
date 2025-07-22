@@ -4,11 +4,11 @@
   gather_facts: yes
   vars:
     iso_path: "/user/svrauto/SA/Image/{{ ISO_Image }}"
-    image_name: "{{ Vendor }}_{{ Model }}_ESXi{{ Ver }}"
+    image_name: "{{ Vendor }}_{{ Model }}_ESXi{{ Ver }}_{{ Infra }}"
     extract_dir: "/user/svrauto/SA/ESXi/{{ image_name }}"
     mount_point: "/tmp/esxi_{{ image_name }}"
     bootcfg_path: "{{ extract_dir }}/boot.cfg"
-    kickstart_url: "ks=nfs://ncfilervwp1.seccae.com/svrauto/svrauto/SA/kickstart/ESXi{{ Ver }}.cfg"
+    kickstart_url: "ks=nfs://ncfilervwp1.seccae.com/svrauto/svrauto/SA/kickstart/ESXi{{ Ver }}_{{ Infra }}.cfg"
 
   tasks:
     - name: Check if image already exists
