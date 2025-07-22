@@ -6,7 +6,7 @@
     iso_path: "/user/svrauto/SA/Image/VMware-VMvisor-Installer-8.0U3e-24674464.x86_64.iso"
     image_name: "{{ Vendor }}_{{ Model }}_ESXi{{ Ver }}"
     extract_dir: "/user/svrauto/SA/ESXi/{{ image_name }}"
-    mount_point: "/tmp/esxi_{{ image_name }}_{{ lookup('pipe', 'date +%s') }}"
+    mount_point: "/tmp/esxi_{{ image_name }}"
     bootcfg_path: "{{ extract_dir }}/boot.cfg"
     kickstart_url: "ks=nfs://ncfilervwp1.seccae.com/svrauto/svrauto/SA/kickstart/ESXi{{ Ver }}.cfg"
 
