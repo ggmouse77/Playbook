@@ -1,0 +1,9 @@
+---
+- name: ddc and reboot
+  hosts: work
+  gather_facts: no
+
+  tasks:
+    - name: execute ddc-awx.sh
+      ansible.builtin.shell: at -f /user/svrauto/SA/INSTLL/run-ddc-awx.sh now
+      changed_when: false
